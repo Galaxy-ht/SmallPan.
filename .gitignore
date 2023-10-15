@@ -1,0 +1,4 @@
+# 项目排除路径
+/easypan/target/
+/easypan-front/dist/
+/easypan-front/node_modules/

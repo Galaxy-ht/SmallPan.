@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.easypan.mappers.EmailCodeDao">
+
+    <resultMap type="com.easypan.entity.po.EmailCode" id="emailCodeMap">
+        <result property="email" column="email"/>
+        <result property="code" column="code"/>
+        <result property="creatTime" column="creat_time"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <update id="disableEmailCode">
+        update email_code
+        set status = 1
+        where email = #{email}
+          and status = 0
+    </update>
+</mapper>

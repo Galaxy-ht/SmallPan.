@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.easypan.mappers.FileInfoDao">
+
+    <resultMap type="com.easypan.entity.po.FileInfo" id="fileInfoMap">
+        <result property="fileId" column="file_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="fileMd5" column="file_md5"/>
+        <result property="filePid" column="file_pid"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileCover" column="file_cover"/>
+        <result property="filePath" column="file_path"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastUpdateTime" column="last_update_time"/>
+        <result property="folderType" column="folder_type"/>
+        <result property="fileCategory" column="file_category"/>
+        <result property="fileType" column="file_type"/>
+        <result property="status" column="status"/>
+        <result property="recoveryTime" column="recovery_time"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+    <update id="updateFileDelFlagBatch">
+        update file_info
+        <set>
+            <if test="bean.fileMd5 != null">
+                file_md5 = #{bean.fileMd5},
+            </if>
+            <if test="bean.filePid != null">
+                file_pid = #{bean.filePid},
+            </if>
+            <if test="bean.fileSize != null">
+                file_size = #{bean.fileSize},
+            </if>
+            <if test="bean.fileName != null">
+                file_name = #{bean.fileName},
+            </if>
+            <if test="bean.fileCover != null">
+                file_cover = #{bean.fileCover},
+            </if>
+            <if test="bean.filePath != null">
+                file_path = #{bean.filePath},
+            </if>
+            <if test="bean.createTime != null">
+                create_time = #{bean.createTime},
+            </if>
+            <if test="bean.lastUpdateTime != null">
+                last_update_time = #{bean.lastUpdateTime},
+            </if>
+            <if test="bean.folderType != null">
+                folder_type = #{bean.folderType},
+            </if>
+            <if test="bean.fileCategory != null">
+                file_category = #{bean.fileCategory},
+            </if>
+            <if test="bean.fileType != null">
+                file_type = #{bean.fileType},
+            </if>
+            <if test="bean.status != null">
+                status = #{bean.status},
+            </if>
+            <if test="bean.recoveryTime != null">
+                recovery_time = #{bean.recoveryTime},
+            </if>
+            <if test="bean.delFlag != null">
+                del_flag = #{bean.delFlag},
+            </if>
+        </set>
+        where user_id = #{userId}
+        <if test="filePidList!=null">
+            and file_pid in(<foreach collection="filePidList" separator="," item="item">#{item}</foreach>)
+        </if>
+        <if test="fileIdList!=null">
+            and file_id in(<foreach collection="fileIdList" separator="," item="item">#{item}</foreach>)
+        </if>
+        <if test="oldDelFlag!=null">
+            and del_flag = #{oldDelFlag}
+        </if>
+    </update>
+    <update id="updateByFileIdAndUserId" parameterType="com.easypan.entity.po.FileInfo">
+        UPDATE file_info
+        <set>
+            <if test="bean.fileMd5 != null">
+                file_md5 = #{bean.fileMd5},
+            </if>
+            <if test="bean.filePid != null">
+                file_pid = #{bean.filePid},
+            </if>
+            <if test="bean.fileSize != null">
+                file_size = #{bean.fileSize},
+            </if>
+            <if test="bean.fileName != null">
+                file_name = #{bean.fileName},
+            </if>
+            <if test="bean.fileCover != null">
+                file_cover = #{bean.fileCover},
+            </if>
+            <if test="bean.filePath != null">
+                file_path = #{bean.filePath},
+            </if>
+            <if test="bean.createTime != null">
+                create_time = #{bean.createTime},
+            </if>
+            <if test="bean.lastUpdateTime != null">
+                last_update_time = #{bean.lastUpdateTime},
+            </if>
+            <if test="bean.folderType != null">
+                folder_type = #{bean.folderType},
+            </if>
+            <if test="bean.fileCategory != null">
+                file_category = #{bean.fileCategory},
+            </if>
+            <if test="bean.fileType != null">
+                file_type = #{bean.fileType},
+            </if>
+            <if test="bean.status != null">
+                status = #{bean.status},
+            </if>
+            <if test="bean.recoveryTime != null">
+                recovery_time = #{bean.recoveryTime},
+            </if>
+            <if test="bean.delFlag != null">
+                del_flag = #{bean.delFlag},
+            </if>
+        </set>
+        where file_id=#{fileId} and user_id=#{userId}
+    </update>
+    <delete id="delFileBatch">
+        delete from file_info where user_id = #{userId}
+        <if test="filePidList!=null">
+            and file_pid in(<foreach collection="filePidList" separator="," item="item">#{item}</foreach>)
+        </if>
+        <if test="fileIdList!=null">
+            and file_id in(<foreach collection="fileIdList" separator="," item="item">#{item}</foreach>)
+        </if>
+        <if test="oldDelFlag!=null">
+            and del_flag = #{oldDelFlag}
+        </if>
+    </delete>
+
+
+    <select id="selectUseSpace" resultType="java.lang.Long">
+        select IFNULL(SUM(file_size), 0)
+        from file_info
+        where user_id = #{userId}
+    </select>
+
+
+</mapper>

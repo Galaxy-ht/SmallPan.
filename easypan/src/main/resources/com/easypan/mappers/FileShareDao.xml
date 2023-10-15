@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.easypan.mappers.FileShareDao">
+
+    <resultMap type="com.easypan.entity.FileShare" id="fileShareMap">
+        <result property="shareId" column="share_id"/>
+        <result property="fileId" column="file_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="validType" column="valid_type"/>
+        <result property="expireTime" column="expire_time"/>
+        <result property="shareTime" column="share_time"/>
+        <result property="code" column="code"/>
+        <result property="showCount" column="show_count"/>
+    </resultMap>
+
+    <sql id="base_column_list">
+        share_id
+        ,s.file_id,s.user_id,valid_type,expire_time,
+		 share_time,code,show_count
+    </sql>
+
+    <sql id="query_condition">
+        <where>
+            <include refid="base_condition_filed"/>
+            <if test="query.shareIdFuzzy!= null  and query.shareIdFuzzy!=''">
+                and share_id like concat('%', #{query.shareIdFuzzy}, '%')
+            </if>
+            <if test="query.fileIdFuzzy!= null  and query.fileIdFuzzy!=''">
+                and s.file_id like concat('%', #{query.fileIdFuzzy}, '%')
+            </if>
+            <if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
+                and s.user_id like concat('%', #{query.userIdFuzzy}, '%')
+            </if>
+            <if test="query.expireTimeStart!= null and query.expireTimeStart!=''">
+                <![CDATA[ and  expire_time>=str_to_date(#{query.expireTimeStart}, '%Y-%m-%d') ]]>
+            </if>
+            <if test="query.expireTimeEnd!= null and query.expireTimeEnd!=''">
+                <![CDATA[ and  expire_time< date_sub(str_to_date(#{query.expireTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+            </if>
+            <if test="query.shareTimeStart!= null and query.shareTimeStart!=''">
+                <![CDATA[ and  share_time>=str_to_date(#{query.shareTimeStart}, '%Y-%m-%d') ]]>
+            </if>
+            <if test="query.shareTimeEnd!= null and query.shareTimeEnd!=''">
+                <![CDATA[ and  share_time< date_sub(str_to_date(#{query.shareTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+            </if>
+            <if test="query.codeFuzzy!= null  and query.codeFuzzy!=''">
+                and code like concat('%', #{query.codeFuzzy}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <sql id="base_condition_filed">
+        <if test="query.shareId != null and query.shareId!=''">
+            and share_id = #{query.shareId}
+        </if>
+        <if test="query.fileId != null and query.fileId!=''">
+            and s.file_id = #{query.fileId}
+        </if>
+        <if test="query.userId != null and query.userId!=''">
+            and s.user_id = #{query.userId}
+        </if>
+        <if test="query.validType != null">
+            and valid_type = #{query.validType}
+        </if>
+        <if test="query.expireTime != null and query.expireTime!=''">
+            <![CDATA[ and  expire_time=str_to_date(#{query.expireTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.shareTime != null and query.shareTime!=''">
+            <![CDATA[ and  share_time=str_to_date(#{query.shareTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.code != null and query.code!=''">
+            and code = #{query.code}
+        </if>
+        <if test="query.showCount != null">
+            and show_count = #{query.showCount}
+        </if>
+    </sql>
+
+    <sql id="base_condition">
+        <where>
+            <include refid="base_condition_filed"/>
+        </where>
+    </sql>
+
+    <delete id="deleteFileShareBatch">
+        delete from file_share where user_id = #{userId}
+        and share_id in(<foreach collection="shareIdArray" separator="," item="item">#{item}</foreach>)
+    </delete>
+
+    <select id="selectList" resultMap="fileShareMap">
+        SELECT
+        <include refid="base_column_list"/>
+        <if test="query.queryFileName!=null and query.queryFileName">
+            ,f.file_name,f.folder_type,f.file_category,f.file_type,f.file_cover
+        </if>
+        FROM file_share s
+        <if test="query.queryFileName!=null and query.queryFileName">
+            left join file_info f on s.file_id = f.file_id and f.user_id = #{query.userId}
+        </if>
+        <include refid="query_condition"/>
+        <if test="query.orderBy!=null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.simplePage!=null">
+            limit #{query.start},#{query.end}
+        </if>
+    </select>
+
+</mapper>
